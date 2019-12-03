@@ -5,6 +5,8 @@ from nltk.corpus import stopwords
 import feature_extractor
 from nltk_nb import NBModel
 
+from joblib import delayed, Parallel
+
 cached_stopwords = stopwords.words('english')
 tokenizer = ToktokTokenizer()
 
@@ -62,6 +64,7 @@ if __name__ == '__main__':
 
     train = [(feature_extractor.extract_all(x), int(x['stars'])) for x in train_set]
     dev = [(feature_extractor.extract_all(x), int(x['stars'])) for x in dev_set]
+
 
 
     model = NBModel(train,dev)

@@ -1,7 +1,9 @@
 import collections
 import json
 import pprint
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
+sent = SentimentIntensityAnalyzer()
 
 def extract_all(instance):
     features = {}
@@ -11,8 +13,12 @@ def extract_all(instance):
     features["useful"] = instance["useful"]
     features["funny"] = instance["funny"]
     features["cool"] = instance["cool"]
+    features['vader_sentiment'] = get_vader_sentiment(' '.join(instance['tokens']))
 
     return features
+
+def get_vader_sentiment(instance):
+    return sent.polarity_scores(instance)['compound']
 
 
 def get_length(instance):
