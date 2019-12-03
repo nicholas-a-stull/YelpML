@@ -1,4 +1,5 @@
 from collections import defaultdict, Counter
+import nltk, copy
 
 class BOW():
 
@@ -37,27 +38,56 @@ class BOW():
         return bow_dict
 
     def get_vocabulary_features(self, tokens):
-        temp = self.vocabulary_vector
+        temp = copy.deepcopy(self.vocabulary_vector)
         for tok in tokens:
             try:
                 temp[tok] += 1
             except Exception as e:
-                temp['<unk>'] += 1
+                pass
 
         return temp
 
 
-    def create_vocabulary(self, n=10000):
+    def create_vocabulary(self, n=50):
         text_series = self.df['text']
         tokens = [x for instances in text_series.values.tolist() for x in instances]
         counted = Counter(tokens)
+
+        print(counted.most_common(50))
+        print(len(counted.most_common()))
 
         self.vocabulary = [x[0] for x in counted.most_common(n)]
         self.vocabulary_vector = {}
         for word in self.vocabulary:
             self.vocabulary_vector[word] = 0
-        self.vocabulary_vector['<unk>'] = 0
+        #self.vocabulary_vector['<unk>'] = 0
 
 
+    def get_bigrams(self,li):
+        return list(nltk.bigrams(li))
 
+    def create_bigram_vocabulary(self, n=50):
+        text_series = self.df['text']
 
+        text_series_bigrams = text_series.apply(func=self.get_bigrams)
+
+        all_bigrams = [bigram for instances in text_series_bigrams.values.tolist() for bigram in instances]
+        counted_bigrams = Counter(all_bigrams)
+
+        self.bigrams = [x[0] for x in counted_bigrams.most_common(n)]
+        self.bigram_vector = {}
+        for bigram in self.bigrams:
+            self.bigram_vector[bigram] = 0
+        #self.bigram_vector['<unk>'] = 0
+
+    def get_bigram_features(self, tokens):
+        temp = copy.deepcopy(self.bigram_vector)
+        bigrams = nltk.bigrams(tokens)
+
+        for bigram in bigrams:
+            try:
+                temp[bigram] += 1
+            except:
+                pass
+
+        return temp
