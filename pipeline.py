@@ -2,6 +2,11 @@ import json, pickle, os, math
 from nltk.tokenize import ToktokTokenizer
 from nltk.corpus import stopwords
 
+import feature_extractor
+from nltk_nb import NBModel
+
+from joblib import delayed, Parallel
+
 cached_stopwords = stopwords.words('english')
 tokenizer = ToktokTokenizer()
 
@@ -55,10 +60,16 @@ if __name__ == '__main__':
     train_set = train_set_preprocessed[:train_value]
     dev_set = train_set_preprocessed[train_value:]
 
-    train = [(extract_features(x), int(x['stars'])) for x in train_set]
-    dev = [(extract_features(x), int(x['stars'])) for x in dev_set]
 
-    
+
+    train = [(feature_extractor.extract_all(x), int(x['stars'])) for x in train_set]
+    dev = [(feature_extractor.extract_all(x), int(x['stars'])) for x in dev_set]
+
+
+
+    model = NBModel(train,dev)
+    print(model.validate())
+
 
 
     
