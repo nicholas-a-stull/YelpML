@@ -55,10 +55,14 @@ if __name__ == '__main__':
     train_set = train_set_preprocessed[:train_value]
     dev_set = train_set_preprocessed[train_value:]
 
-    train = [(extract_features(x), int(x['stars'])) for x in train_set]
+
+
+    train = [(x['tokens'], int(x['stars'])) for x in train_set]
     dev = [(extract_features(x), int(x['stars'])) for x in dev_set]
 
-    
+    print(train)
+
+
 
 
     
