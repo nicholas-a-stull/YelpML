@@ -24,6 +24,7 @@ if __name__ == "__main__":
             elif x["useful"] > 10:
                 onestarinfo[3] += 1
 
+
         if x["stars"] ==  2.0:
             if x["useful"] == 0:
                 twostarinfo[0] += 1
@@ -33,6 +34,7 @@ if __name__ == "__main__":
                 twostarinfo[2] += 1
             if x["useful"] > 2:
                 twostarinfo[3] += 1
+
 
         if x["stars"] ==  3.0:
             if x["useful"] == 0:
@@ -74,11 +76,5 @@ if __name__ == "__main__":
     plt.show()
 
 
-
-    
-
-
-
-        
 
 
