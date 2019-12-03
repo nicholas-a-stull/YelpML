@@ -1,31 +1,69 @@
 import collections
 import json
 import pprint
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from pandas import Series
 
-sent = SentimentIntensityAnalyzer()
+
+from bow import BOW
+
+class FeatureExtractor():
+    def __init__(self, bow):
+        self.bow = bow
+
+
+    def df_to_feats(self, df):
+
+        df['text'] = df['text'].apply(self.extract_all)
+        df['stars'] = df['stars'].apply(lambda x : 'pos' if x >= 3 else 'neg')
+
+        feature_series = df.loc[:, ['text', 'stars']]
+
+        return list(feature_series.itertuples(index=False, name=None))
+
+    def get_negative_words(self, tokens):
+        negative_words = {"terrible", "horrible", "waste", "never", "instead", "disappointed", "cold", "guess", "girl"}
+        num_negative = 0
+        for token in tokens:
+            if token in negative_words:
+                num_negative += 1
+        return num_negative
+
+    def get_positive_words(self, tokens):
+        positive_words = {"perfectly", "back!", "great!", "reviews", "perfect", "care", "amazing", "friendly"}
+        num_positive = 0
+        for token in tokens:
+            if token in positive_words:
+                num_positive += 1
+        return num_positive
+
+    def extract_all(self, tokens):
+        features = {}
+
+        #features.update(self.bow.get_by_star_bow(tokens))
+        features['num_pos'] = self.get_positive_words(tokens)
+        features['num_neg'] = self.get_negative_words(tokens)
+
+        return features
+
 
 def extract_all(instance):
     features = {}
     
-    features["length"] = get_length(instance)
+    #features["length"] = get_length(instance)
     features["negative-words"] = get_negative_words(instance)
     features["positive-words"] = get_positive_words(instance)
-    features["more-positive-words"] = get_more_positive_or_negative(features)
-    features["most-common-number"] = get_most_common_number(instance)
+    #features["more-positive-words"] = get_more_positive_or_negative(features)
+    #features["most-common-number"] = get_most_common_number(instance)
     features["most-common-stars"] = get_most_common_stars(instance)
     features["contains-smiley-face"] = get_contains_smiley_face(instance)
+
     
-    features['vader_sentiment'] = get_vader_sentiment(' '.join(instance['tokens']))
-    
-    features["useful"] = instance["useful"]
-    features["funny"] = instance["funny"]
-    features["cool"] = instance["cool"]
+    #features["useful"] = instance["useful"]
+    #features["funny"] = instance["funny"]
+    #features["cool"] = instance["cool"]
 
     return features
 
-def get_vader_sentiment(instance):
-    return sent.polarity_scores(instance)['compound']
 
 def get_length(instance):
     return len(instance["tokens"])

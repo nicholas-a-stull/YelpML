@@ -4,8 +4,8 @@ from nltk.corpus import stopwords
 
 import feature_extractor
 from nltk_nb import NBModel
+from bow import BOW
 
-from joblib import delayed, Parallel
 
 cached_stopwords = stopwords.words('english')
 tokenizer = ToktokTokenizer()
@@ -27,7 +27,7 @@ def preprocess(train_set):
 
     # iterate through trainset and preprocess data
     for id, instance in enumerate(train_set):
-        if id % 100000 == 0:
+        if id % 25000 == 0:
             print(id)
         tokens = nltk_preprocess(instance['text'])
         train_set_preprocessed.append({
@@ -39,6 +39,7 @@ def preprocess(train_set):
         })
 
     pickle.dump(train_set_preprocessed, open('train_set_stop.pickle', 'wb'))
+    return train_set_preprocessed
 
 
 if __name__ == '__main__':
@@ -60,15 +61,21 @@ if __name__ == '__main__':
     train_set = train_set_preprocessed[:train_value]
     dev_set = train_set_preprocessed[train_value:]
 
-
+    bow = BOW(train_set_preprocessed)
+    bow.calculate_independent_words()
+    pickle.dump(bow, open('bow.pickle', 'wb'))
+    print('Finished BOW')
 
     train = [(feature_extractor.extract_all(x), int(x['stars'])) for x in train_set]
     dev = [(feature_extractor.extract_all(x), int(x['stars'])) for x in dev_set]
+
+    print(train[:5])
 
 
 
     model = NBModel(train,dev)
     print(model.validate())
+    print(model.informative_features())
 
 
 
