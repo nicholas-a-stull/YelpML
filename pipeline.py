@@ -13,8 +13,12 @@ def nltk_preprocess(text, remove_stopwords = True):
 
     return tokens
 
+def extract_features(instance_dictionary):
+    return {'feat1' : 0, 'feat2': 1}
+
 def preprocess(train_set):
 
+    train_set_preprocessed = []
 
     # iterate through trainset and preprocess data
     for id, instance in enumerate(train_set):
@@ -25,10 +29,11 @@ def preprocess(train_set):
             'tokens': tokens,
             'useful': instance['useful'],
             'funny': instance['funny'],
-            'cool': instance['cool']
+            'cool': instance['cool'],
+            'stars': instance['stars']
         })
 
-    #pickle.dump(train_set_preprocessed, open('train_set_stop.pickle', 'wb'))
+    pickle.dump(train_set_preprocessed, open('train_set_stop.pickle', 'wb'))
 
 
 if __name__ == '__main__':
@@ -49,6 +54,12 @@ if __name__ == '__main__':
 
     train_set = train_set_preprocessed[:train_value]
     dev_set = train_set_preprocessed[train_value:]
+
+    train = [(extract_features(x), int(x['stars'])) for x in train_set]
+    dev = [(extract_features(x), int(x['stars'])) for x in dev_set]
+
+    
+
 
     
 
