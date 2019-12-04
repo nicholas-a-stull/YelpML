@@ -2,6 +2,7 @@ import collections
 import json
 import pprint
 from pandas import Series
+import numpy
 
 
 from bow import BOW
@@ -11,7 +12,7 @@ class FeatureExtractor():
         self.bow = bow
 
 
-    def df_to_feats(self, df):
+    def df_to_feats_nltk(self, df):
 
         df['text'] = df['text'].apply(self.extract_all)
         #df['stars'] = df['stars'].apply(lambda x : 'pos' if x >= 3 else 'neg')
@@ -19,6 +20,16 @@ class FeatureExtractor():
         feature_series = df.loc[:, ['text', 'stars']]
 
         return list(feature_series.itertuples(index=False, name=None))
+
+    def df_to_feats_skl(self, df):
+
+        #Extract features from tokens
+        df['text'] = df['text'].apply(self.extract_all)
+
+        X = numpy.vstack(df.loc[:, 'text'].to_numpy())
+        label = df.loc[:, 'stars'].to_numpy()
+
+        return X, label
 
     def get_negative_words(self, tokens):
         negative_words = {"terrible", "horrible", "waste", "never", "instead", "disappointed", "cold", "guess", "girl"}
@@ -38,12 +49,7 @@ class FeatureExtractor():
 
     def extract_all(self, tokens):
 
-        features = {}
-
-        features.update(self.bow.get_vocabulary_features(tokens))
-        features.update(self.bow.get_bigram_features(tokens))
-        # features['num_pos'] = self.get_positive_words(tokens)
-        # features['num_neg'] = self.get_negative_words(tokens)
+        features = numpy.concatenate((self.bow.get_vocabulary_features(tokens), self.bow.get_bigram_features(tokens)))
 
         return features
 

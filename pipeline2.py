@@ -1,10 +1,10 @@
-import pandas, json, nltk, pickle, re
+import pandas, json, nltk, pickle, re, numpy, sklearn
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
 from bow import BOW
 from feature_extractor import FeatureExtractor
-from nltk_nb import NBModel
+from skl_nb import NBModel
 
 cached_stopwords = stopwords.words('english')
 
@@ -28,10 +28,12 @@ def preprocess(text):
 
 if __name__ == '__main__':
 
-    train_file = "data_train.json"
-    all_avail = pandas.read_json(open(train_file, 'r'))[:50000]
-
-    all_avail['text'] = all_avail['text'].apply(func=preprocess)
+    # train_file = "data_train.json"
+    # all_avail = pandas.read_json(open(train_file, 'r'))
+    #
+    # all_avail['text'] = all_avail['text'].apply(func=preprocess)
+    # pickle.dump(all_avail, open('all_avail.pickle', 'wb'))
+    all_avail = pickle.load(open('all_avail.pickle', 'rb'))
     print('Finished preprocessing')
 
     #80-20 Split for training and development
@@ -42,20 +44,21 @@ if __name__ == '__main__':
     bow = BOW(train_set)
 
     #Create vocabulary
-    #bow.create_vocabulary(n=500)
     bow.create_bigram_vocabulary(500)
     bow.create_vocabulary(500)
     print('Finished BOW')
 
     feats = FeatureExtractor(bow)
-    train_feats = feats.df_to_feats(train_set)
-    dev_feats = feats.df_to_feats(dev_set)
+    train_X, train_label = feats.df_to_feats_skl(train_set)
+    dev_X, dev_label = feats.df_to_feats_skl(dev_set)
 
+    print(train_X)
+    print(train_label)
 
-    model = NBModel(train_feats, dev_feats)
-    print('Finished Training')
-    pickle.dump(model, open('model.pickle', 'wb'))
+    print('Finished converting instances to vectors')
 
+    model = NBModel(train_X, train_label, dev_X, dev_label)
+    model.train()
     print(model.validate())
 
 
