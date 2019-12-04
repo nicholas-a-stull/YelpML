@@ -21,31 +21,19 @@ class FeatureExtractor():
 
         return list(feature_series.itertuples(index=False, name=None))
 
-    def df_to_feats_skl(self, df):
+    def df_to_feats_skl(self, df, label=True):
 
         #Extract features from tokens
         df['text'] = df['text'].apply(self.extract_all)
 
         X = numpy.vstack(df.loc[:, 'text'].to_numpy())
-        label = df.loc[:, 'stars'].to_numpy()
 
-        return X, label
+        label_ret = None
+        if label:
+            label_ret = df.loc[:, 'stars'].to_numpy()
 
-    def get_negative_words(self, tokens):
-        negative_words = {"terrible", "horrible", "waste", "never", "instead", "disappointed", "cold", "guess", "girl"}
-        num_negative = 0
-        for token in tokens:
-            if token in negative_words:
-                num_negative += 1
-        return num_negative
+        return X, label_ret
 
-    def get_positive_words(self, tokens):
-        positive_words = {"perfectly", "back!", "great!", "reviews", "perfect", "care", "amazing", "friendly"}
-        num_positive = 0
-        for token in tokens:
-            if token in positive_words:
-                num_positive += 1
-        return num_positive
 
     def extract_all(self, tokens):
 

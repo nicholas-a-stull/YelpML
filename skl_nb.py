@@ -21,6 +21,9 @@ class NBModel():
     def validate(self):
          return self.model.score(self.dev_x, self.dev_y)
 
+    def predict(self, test):
+        return self.model.predict(test)
+
 
 
 

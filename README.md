@@ -16,6 +16,35 @@
        uncomment/comment the correct lines to only run preprocessing once.
     - Model selection is handled at the end of the pipeline, using one of the model objects.
     
+
+###How to run the system
+
+#### Requirements
+    - pip requirements found in requirements.txt
+    - nltk requires: punkt, stopwords
+
+####From Scratch (note: to run preprocessing, uncomment out the block in load_data of pipeline.py, lines 41-43)
+    - Import correct files (example in main() of pipeline.py
+    - Create a pipeline object : pipe = Pipeline()
+    - Train the model with arguments: pipe.run_training(train_file, validate, run_nb, run_lr)
+        - train_file : file to train on
+        - validate   : whether or not to do 80-20 split of training data and return validation accuracy
+        - run_nb     : True/False, whether or not to train NaiveBayes model (default: False)
+        - run_lr     : True/False, whether or not to train Logistic Regression model (default: False)
+    - Get predictions: pipe.predict(test_file, model_type)
+        - model_type : either 'lr', 'nb'
+    - Print predictions to csv: pipe.pred_to_csv(prediction)
+    
+    
+####Using Pre-trained model
+    - Make sure necessary files are in pickles folder (feats.pickle, (log_reg/nb).pickle)
+    - Create pipeline: pipe = Pipeline()
+    - Load model: pipe.load_model(model_type)
+        -model_type : either 'lr' or 'nb
+    - Load feature generator: pipe.feats = joblib.load('feats.pickle')
+    
+    Getting and printing predictions are same as above
+    
     
     
     
