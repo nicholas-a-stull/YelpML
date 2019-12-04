@@ -6,6 +6,9 @@ from bow import BOW
 from feature_extractor import FeatureExtractor
 from skl_nb import NBModel
 
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+
 cached_stopwords = stopwords.words('english')
 
 
@@ -30,7 +33,7 @@ if __name__ == '__main__':
 
     # train_file = "data_train.json"
     # all_avail = pandas.read_json(open(train_file, 'r'))
-    #
+    
     # all_avail['text'] = all_avail['text'].apply(func=preprocess)
     # pickle.dump(all_avail, open('all_avail.pickle', 'wb'))
     all_avail = pickle.load(open('all_avail.pickle', 'rb'))
@@ -54,12 +57,20 @@ if __name__ == '__main__':
 
     print(train_X)
     print(train_label)
-
     print('Finished converting instances to vectors')
 
+    #Train naive bayes and get its accuracy
     model = NBModel(train_X, train_label, dev_X, dev_label)
     model.train()
+    print("Naive Bayes Model Accurracy:")
     print(model.validate())
+
+    #Train logistic regression and get its accurracy
+    model2 = LogisticRegression()
+    model2.fit(train_X, train_label)
+    model2_acc = model2.score(dev_X, dev_label)
+    print("\nLogistic Regression Model Accurracy:")
+    print(model2_acc)
 
 
 
