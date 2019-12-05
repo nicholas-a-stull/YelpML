@@ -164,7 +164,11 @@ def main():
     #pipe.pred_to_csv(predictions)
     #print(predictions)
 
-    #This block loads models from the pickle directory
+    # This block loads models from the pickle directory
+    # Due to the large size of pickled files, only preprocessed data is included
+    # Use the following block only if the above block has been run.
+    # Predictions.csv has created using logistic regression trained on the whole dataset, i.e. validate=False
+
     # pipe = Pipeline()
     # pipe.load_model('lr')
     # pipe.feats = joblib.load('pickles/feats.pickle')
