@@ -7,10 +7,12 @@
     - pipeline.py: Runs the whole pipeline for classification, including preprocessing, creating vocabulary,
        converting text features to vectors and running the model.
     - feature_extractor.py: Handles feature extraction for dataframes
-    - skl_{nb,log}.py: Simple files to handle training and validation for their respective models
+    - skl_{nb,log,ptron}.py: Simple files to handle training and validation for their respective models
     
     
 ###Notes on running and runtime:
+    - Features are saved based on last saved model -- may change depending on how much of the dataset was
+       used to train. predictions.csv was generated using feats generated from ALL of the train dataset.
     - Loading the data and preprocessing the data takes a decent amount of time due to tokenization
     - To save time, the pipeline pickles the preprocessed data, so if you are running the code twice,
        uncomment/comment the correct lines to only run preprocessing once.
@@ -35,7 +37,7 @@
         - run_nb     : True/False, whether or not to train NaiveBayes model (default: False)
         - run_lr     : True/False, whether or not to train Logistic Regression model (default: False)
     - Get predictions: pipe.predict(test_file, model_type)
-        - model_type : either 'lr', 'nb'
+        - model_type : either 'lr', 'nb', 'pt'
     - Print predictions to csv: pipe.pred_to_csv(prediction)
     
     
@@ -43,7 +45,7 @@
     - Make sure necessary files are in pickles folder (feats.pickle, (log_reg/nb).pickle)
     - Create pipeline: pipe = Pipeline()
     - Load model: pipe.load_model(model_type)
-        -model_type : either 'lr' or 'nb
+        -model_type : either 'lr' or 'nb', 'pt'
     - Load feature generator: pipe.feats = joblib.load('feats.pickle')
     
     Getting and printing predictions are same as above

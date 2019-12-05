@@ -6,10 +6,7 @@ from bow import BOW
 from feature_extractor import FeatureExtractor
 from skl_nb import NBModel
 from skl_log import LogReg
-
-
-from sklearn.metrics import confusion_matrix
-
+from skl_ptron import Ptron
 
 
 class Pipeline():
@@ -18,6 +15,7 @@ class Pipeline():
         self.cached_stopwords = stopwords.words('english')
         self.nb = None
         self.log_reg = None
+        self.ptron = None
 
     def preprocess(self,text):
         # Lower case and strip whitespace
@@ -72,7 +70,7 @@ class Pipeline():
         else:
             return train_X, train_label
 
-    def run_training(self, input_file, validate=True, label=True, run_lr = False, run_nb = False):
+    def run_training(self, input_file, validate=True, label=True, run_lr = False, run_nb = False, run_ptron = False):
 
         if validate:
             train_X, train_label, dev_X, dev_label = self.load_data(input_file, validate, label)
@@ -102,6 +100,14 @@ class Pipeline():
                 print("\nLogistic Regression Model Accurracy: {}".format(log_reg.validate()))
             joblib.dump(log_reg, 'pickles/log_reg.pickle')
 
+        if run_ptron:
+            ptron = Ptron(train_X, train_label, dev_X, dev_label)
+            ptron.train()
+            self.ptron = ptron
+            if validate:
+                print('Perceptron Accuracy: {}'.format(ptron.validate()))
+            joblib.dump(ptron, 'pickles/ptron.pickle')
+
 
     def predict_file(self, test_file, model_type):
 
@@ -123,6 +129,9 @@ class Pipeline():
         elif model_type == 'lr' and self.log_reg:
             pred = self.log_reg.predict(test_x)
 
+        elif model_type == 'pt' and self.ptron:
+            pred = self.ptron.predict(test_x)
+
         return pred
 
     def load_model(self, model_type):
@@ -131,6 +140,9 @@ class Pipeline():
 
         elif model_type == 'lr':
             self.log_reg = joblib.load('pickles/log_reg.pickle')
+
+        elif model_type == 'pt':
+            self.ptron = joblib.load('pickles/ptron.pickle')
 
         else:
             print('No model loaded.')
@@ -145,20 +157,20 @@ class Pipeline():
 def main():
 
     #This block runs the whole pipeline, including training (excludes preprocessing)
-    # pipe = Pipeline()
-    # pipe.run_training('data_train.json', validate=False, run_lr=True, run_nb=False)
-    # print('Finished Training')
-    # predictions = pipe.predict_file('data_test_wo_label.json', model_type= 'lr')
-    # pipe.pred_to_csv(predictions)
-    # print(predictions)
+    pipe = Pipeline()
+    pipe.run_training('data_train.json', validate=False, run_lr=True, run_nb=False, run_ptron=False)
+    print('Finished Training')
+    #predictions = pipe.predict_file('data_test_wo_label.json', model_type= 'pt')
+    #pipe.pred_to_csv(predictions)
+    #print(predictions)
 
     #This block loads models from the pickle directory
-    pipe = Pipeline()
-    pipe.load_model('lr')
-    pipe.feats = joblib.load('pickles/feats.pickle')
-    predictions = pipe.predict_file('data_test_wo_label.json', model_type = 'lr')
-    pipe.pred_to_csv(predictions)
-    print(predictions)
+    # pipe = Pipeline()
+    # pipe.load_model('lr')
+    # pipe.feats = joblib.load('pickles/feats.pickle')
+    # predictions = pipe.predict_file('data_test_wo_label.json', model_type = 'lr')
+    # pipe.pred_to_csv(predictions)
+    # print(predictions)
 
 if __name__ == '__main__':
     main()
