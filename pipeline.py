@@ -38,6 +38,7 @@ class Pipeline():
 
         fname = file[:-5]
 
+        ### UNCOMMENT TO PREPROCESS TRAINING DATA ###
         # all_avail = pandas.read_json(open(file, 'r'))
         # all_avail['text'] = all_avail['text'].apply(func=self.preprocess)
         # pickle.dump(all_avail, open('pickles/'+fname + '.pickle', 'wb'))
@@ -64,7 +65,6 @@ class Pipeline():
         train_X, train_label = self.feats.df_to_feats_skl(train_set, label)
 
         joblib.dump(self.feats, 'pickles/feats.pickle')
-        print('dumped nb')
         if validate:
             dev_X, dev_label = self.feats.df_to_feats_skl(dev_set, label)
             return train_X, train_label, dev_X, dev_label
@@ -146,17 +146,18 @@ def main():
 
     #This block runs the whole pipeline, including training (excludes preprocessing)
     # pipe = Pipeline()
-    # pipe.run_training('data_train.json', validate=False, run_lr=False, run_nb=True)
+    # pipe.run_training('data_train.json', validate=False, run_lr=True, run_nb=False)
     # print('Finished Training')
-    # predictions = pipe.predict_file('data_test_wo_label.json', model_type= 'nb')
+    # predictions = pipe.predict_file('data_test_wo_label.json', model_type= 'lr')
+    # pipe.pred_to_csv(predictions)
     # print(predictions)
 
     #This block loads models from the pickle directory
     pipe = Pipeline()
-    pipe.load_model('nb')
+    pipe.load_model('lr')
     pipe.feats = joblib.load('pickles/feats.pickle')
-    predictions = pipe.predict_file('data_test_wo_label.json', model_type = 'nb')
-    #pipe.pred_to_csv(predictions)
+    predictions = pipe.predict_file('data_test_wo_label.json', model_type = 'lr')
+    pipe.pred_to_csv(predictions)
     print(predictions)
 
 if __name__ == '__main__':

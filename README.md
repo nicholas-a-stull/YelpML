@@ -15,6 +15,9 @@
     - To save time, the pipeline pickles the preprocessed data, so if you are running the code twice,
        uncomment/comment the correct lines to only run preprocessing once.
     - Model selection is handled at the end of the pipeline, using one of the model objects.
+    - Prediction can be done on any trained or loaded model
+    - Naive Bayes may cause a Segmentation Fault, this happened only when other programs were running at the same time
+    - log_reg.pickle and nb.pickle are pretrained models, which can be loaded as specified below. 
     
 
 ###How to run the system
