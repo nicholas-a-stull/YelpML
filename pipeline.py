@@ -36,12 +36,13 @@ class Pipeline():
 
         fname = file[:-5]
 
-        ### UNCOMMENT TO PREPROCESS TRAINING DATA ###
-        # all_avail = pandas.read_json(open(file, 'r'))
-        # all_avail['text'] = all_avail['text'].apply(func=self.preprocess)
-        # pickle.dump(all_avail, open('pickles/'+fname + '.pickle', 'wb'))
+        ### THIS BLOCK USED TO PREPROCESS TRAINING DATA ###
+        all_avail = pandas.read_json(open(file, 'r'))
+        all_avail['text'] = all_avail['text'].apply(func=self.preprocess)
+        pickle.dump(all_avail, open('pickles/'+fname + '.pickle', 'wb'))
 
-        all_avail = pickle.load(open('pickles/'+fname + '.pickle', 'rb'))
+        ### UNCOMMENT TO LOAD SAVED PREPROCESSED FILES
+        #all_avail = pickle.load(open('pickles/'+fname + '.pickle', 'rb'))
         print('Finished preprocessing')
 
         # 80-20 Split for training and development
@@ -160,8 +161,8 @@ def main():
     pipe = Pipeline()
     pipe.run_training('data_train.json', validate=False, run_lr=True, run_nb=False, run_ptron=False)
     print('Finished Training')
-    #predictions = pipe.predict_file('data_test_wo_label.json', model_type= 'pt')
-    #pipe.pred_to_csv(predictions)
+    predictions = pipe.predict_file('data_test_wo_label.json', model_type= 'pt')
+    pipe.pred_to_csv(predictions)
     #print(predictions)
 
     # This block loads models from the pickle directory
